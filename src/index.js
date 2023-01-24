@@ -25,6 +25,7 @@ function searchBox(e){
       }, DEBOUNCE_DELAY)
 }
 
+
 function cleanHtml() {
     if(inputValue === ''){
     countryList.innerHTML = '';

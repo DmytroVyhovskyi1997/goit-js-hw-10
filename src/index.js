@@ -25,10 +25,10 @@ function onInput(e){
         Notiflix.Notify.failure('Oops, there is no country with that name');
       } else if (countries .length >= 2 && countries .length <= 10) {
        
-        renderCountryList(countries );
+        renderList(countries );
       } else if (countries .length === 1) {
   
-        renderOneCountry(countries );
+        renderCountry(countries );
       }
     });
     
@@ -36,7 +36,7 @@ function onInput(e){
   
 
 
-function renderCountryList(users)  {
+function renderList(users)  {
   const markup = users
     .map((user) => { return `<div>
     <img src="${user.flags.svg}" alt="Flag of ${
@@ -49,7 +49,7 @@ function renderCountryList(users)  {
   
 }
 
-function renderOneCountry(users) {
+function renderCountry(users) {
   const markup = users
     .map((user) => {
       return `<div>

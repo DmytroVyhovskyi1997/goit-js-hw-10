@@ -1,72 +1,73 @@
 import './css/styles.css';
 import { fetchCountries } from './fetchCountries';
-import debounce from 'lodash.debounce';
+import Lodash from 'lodash.debounce';
 import Notiflix from 'notiflix';
-
-const DEBOUNCE_DELAY = 300;
 
 const input = document.querySelector('#search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
+const DEBOUNCE_DELAY = 300;
 
 
-input.addEventListener('input', searchBox);
+input.addEventListener('input', Lodash(onInput, DEBOUNCE_DELAY))
+function onInput(e){
+  e.preventDefault();
+    const inputValue = input.value.trim();
+       cleanHtml();   
+  
+      fetchCountries(inputValue).then(countries => {      
 
-function searchBox(e){
-    e.preventDefault()
-    debounce(() => {
-        const inputValue = e.target.value.trim();
-        cleanHtml();
+      if (countries .length > 10) {
+        Notiflix.Notify.info(
+          'Too many matches found. Please enter a more specific name.'
+        );
+      } else if (countries .length === 0) {
+        Notiflix.Notify.failure('Oops, there is no country with that name');
+      } else if (countries .length >= 2 && countries .length <= 10) {
+       
+        renderCountryList(countries );
+      } else if (countries .length === 1) {
+  
+        renderOneCountry(countries );
+      }
+    });
+    
+  }
+  
 
-        fetchCountries(inputValue )
-        .then(({countrys})=> {
-          if(countrys.length >= 10){
-            Notiflix.Notify.info("Too many matches found. Please enter a more specific name.")
-          }else if(countrys.length === 0){
-            Notiflix.Notify.info('Oops, there is no country with that name');
-          }
-          else if(countrys.length >= 2 && countrys.length <= 10){
-            Notiflix.Notify.info();
-          }
-          return countrys.reduse(
-            (markup, country) => createMarkup(country) + markup,
-            ""
-          )
-        })
-        .then(updateNewsList)
-        .catch(onError)
-        .finally(() => input.reset());
-      }, DEBOUNCE_DELAY)
-}
 
-function createMarkup({name,capital,population,flags,languages}){
-  return `
-  <div class="country-card">
-  <img src=${flags} class="country-card" width="30" hight="20">
-  <h2 class="country-name">${name}</h2>
-  <h3 class="country-capital">${capital}</h3>
-  <p class="country-population">${population}</p>
-  <p class="country-languages">${languages}</p>
-  </div>
-  `;
+function renderCountryList(users)  {
+  const markup = users
+    .map((user) => { return `<div>
+    <img src="${user.flags.svg}" alt="Flag of ${
+      user.name.official
+    }" width="30" hight="20">
+       <b>${user.name.official}</p>
+       </div>`;})
+       .join("");
+       countryList.innerHTML = markup;
   
 }
 
-
-
-
-function updateNewsList(markup) {
-  document.getElementById("countryInfo").innerHTML = markup;
+function renderOneCountry(users) {
+  const markup = users
+    .map((user) => {
+      return `<div>
+      <img src="${user.flags.svg}" alt="Flag of ${
+        user.name.official
+          }" width="30" hight="20">
+         <b>${user.name.official}</b></p>
+            <p><b>Capital</b>: ${user.capital}</p>
+            <p><b>Population</b>: ${user.population}</p>
+            <p><b>Languages</b>: ${Object.values(user.languages)} </p>
+                </div>`;
+    })
+    .join("");
+    countryList.innerHTML = markup;
 }
 
-function onError(err) {
-  console.error(err);
-  
-}
 
 function cleanHtml() {
-    if(inputValue === ''){
-    countryList.innerHTML = '';
-    countryInfo.innerHTML = '';
-    return;
-  }}
+  countryList.innerHTML = '';
+  countryInfo.innerHTML = '';
+}

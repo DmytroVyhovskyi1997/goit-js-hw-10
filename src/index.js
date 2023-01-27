@@ -14,15 +14,16 @@ function onInput(e){
   e.preventDefault();
     const inputValue = input.value.trim();
        cleanHtml();   
-  
+  if(inputValue === ""){
+    return
+  }
       fetchCountries(inputValue).then(countries => {      
 
       if (countries.length > 10) {
         Notiflix.Notify.info(
           'Too many matches found. Please enter a more specific name.'
         );
-      } else if (countries.length === 0) {
-        Notiflix.Notify.failure('Oops, there is no country with that name');
+       
       } else if (countries.length >= 2 && countries.length <= 10) {
        
         renderList(countries );
@@ -30,8 +31,10 @@ function onInput(e){
   
         renderCountry(countries );
       }
+    })
+    .catch(error => {
+      Notiflix.Notify.failure('Oops, there is no country with that name');
     });
-    
   }
   
 
